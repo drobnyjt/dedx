@@ -31,6 +31,7 @@ def W(E0, E, Ma):
     return W_plus, W_minus
 
 def S_BV(Za, Zb, Ma, n, E, CK=1.):
+    #Biersack-Varelas stopping
     v = np.sqrt(2*E/Ma)
     beta = v/C
 
@@ -48,13 +49,18 @@ def S_BV(Za, Zb, Ma, n, E, CK=1.):
 
     prefactor = BETHE_BLOCH_PREFACTOR*Zb*Za*Za/beta/beta
     eb = 2.*ME*v*v/I
+    #Bethe stopping modified by Biersack and Varelas
     S_BB_BV = prefactor*np.log(eb + 1. + B/eb)*n
+    #Pure Bethe stopping
     S_BB = prefactor*np.log(eb)*n
+    #Lindhard-Scharff
     S_LS = CK*LINDHARD_SCHARFF_PREFACTOR*(Za**(7./6.)*Zb)/(Za**(2./3.) + Zb**(2./3.))**(3./2.)*np.sqrt(E/Ma*AMU/Q)*n
+    #Biersack-Varelas Interpolation
     S = 1./(1./S_LS + 1./S_BB_BV)
     return S_BB, S_LS, S
 
 def S_MV(Za, Ma, n, E, E0s, alpha0s):
+    #Medvedev-Volkov stopping (2020)
     beta = np.sqrt(1. - (1. + E/Ma/C**2)**(-2.))
 
     prefactor = Za**2/(PI*A0*ME*C**2*beta**2)
@@ -115,7 +121,6 @@ def main():
     plt.semilogx(energies/1E6/Q, S_BB_list, '.', linewidth=lw)
 
     #plt.semilogx(energies/1E6/Q, 1./(1./S_LS_list + 1./S_MV_list), '*')
-
 
     plt.axis([0., 1E5, 0., 1.2*np.max(S_BV_list)])
     plt.ylabel('Stopping Power [eV/A]')
